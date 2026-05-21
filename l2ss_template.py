@@ -304,6 +304,17 @@ def reset_sudoku():
     gesamtfeld = [[eb9[:] for r in eb9[:]] for c in eb9[:]]
     SummeFeldGroessen = 9*9*9
 
+def assert_equal(actual, expected, msg=""):
+    """Simple assertion function"""
+    if actual != expected:
+        print(f"   Fehler: {msg}")
+        print(f"   Erwartet: {expected}")
+        print(f"   Tatsaechlich:      {actual}")
+        return False
+    else:
+        print(f"  Bestanden: {msg}")
+        return True
+
 
 # poor man's unittest mock
 def Ausfuehren_mit_ersatz(ident,ersatz,f,*fargs):
@@ -563,12 +574,16 @@ def test_schlussfolgerung_2_liste():
     reset_sudoku()
     
     # Set field to have value 7
-    Aktualisiere_Feld(1, 1, [7])
+    Aktualisiere_Feld(1, 1, [7, 6])
     # Set other fields in row to exclude 7
     Aktualisiere_Feld(1, 2, [1, 2, 3])
     Aktualisiere_Feld(1, 3, [2, 3, 4])
     Aktualisiere_Feld(1, 4, [1, 5, 6])
     Aktualisiere_Feld(1, 5, [1, 8, 9])
+    Aktualisiere_Feld(1, 6, [1, 8, 9])
+    Aktualisiere_Feld(1, 7, [1, 8, 9])
+    Aktualisiere_Feld(1, 8, [1, 8, 9])
+    Aktualisiere_Feld(1, 9, [1, 8, 9])
     
     other_fields = Andere_Zeilen_Felder(1, 1)
     result = Schlussfolgerung_2_Liste(1, 1, other_fields)
@@ -593,8 +608,29 @@ def test_schlussfolgerung_2():
     reset_sudoku()
     
     # Create a scenario where field (1,1) should have unique value in row
-    Aktualisiere_Feld(1, 1, [7])
-    Aktualisiere_Feld(1, 2, [1, 2])
+    Aktualisiere_Feld(1, 1, [7,6])
+    Aktualisiere_Feld(1, 2, [1, 2, 6])
+    Aktualisiere_Feld(1, 3, [2, 3])
+    Aktualisiere_Feld(1, 4, [1, 5])
+    Aktualisiere_Feld(1, 5, [1, 8])
+    Aktualisiere_Feld(1, 6, [1, 9])
+    Aktualisiere_Feld(1, 7, [1, 2])
+    Aktualisiere_Feld(1, 8, [2, 3])
+    Aktualisiere_Feld(1, 9, [3, 4])
+    
+    result = Schlussfolgerung_2(1, 1)
+    # Should find that 7 is unique in this field for the row
+    assert_equal(result[0], True, "Rule 2 should apply")
+
+
+
+def test_schlussfolgerung_2():
+    """Test Schlussfolgerung_2 (complete rule 2)"""
+    reset_sudoku()
+    
+    # Create a scenario where field (1,1) should have unique value in row
+    Aktualisiere_Feld(1, 1, [7,6])
+    Aktualisiere_Feld(1, 2, [1, 2,6])
     Aktualisiere_Feld(1, 3, [2, 3])
     Aktualisiere_Feld(1, 4, [1, 5])
     Aktualisiere_Feld(1, 5, [1, 8])
